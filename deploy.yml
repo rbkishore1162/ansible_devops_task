@@ -18,4 +18,4 @@
       shell: docker pull {{ image_name }}
 
     - name: Run Docker container
-      shell: docker run -d -p 80:80 --name {{ container_name }} {{ image_name }}
+      shell: docker run -d -p 8080:8080 --name {{ container_name }} {{ image_name }}
