@@ -1,12 +1,5 @@
 pipeline {
     agent any
-    
-    stage('Build Maven Project') {
-    steps {
-        sh 'mvn clean package -DskipTests'
-    }
-}
-
 
     parameters {
         choice(
@@ -24,19 +17,25 @@ pipeline {
 
     stages {
 
-        stage('Stage-1: Build Docker Image') {
+        stage('Build Maven Project') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
-        stage('Stage-2: Tag Docker Image') {
+        stage('Tag Docker Image') {
             steps {
                 sh "docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
-        stage('Stage-3: Login to DockerHub') {
+        stage('Login to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
@@ -44,19 +43,19 @@ pipeline {
             }
         }
 
-        stage('Stage-4: Push Image to DockerHub') {
+        stage('Push Image to DockerHub') {
             steps {
                 sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
-        stage('Stage-5: Remove Image Locally') {
+        stage('Remove Image Locally') {
             steps {
                 sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
             }
         }
 
-        stage('Stage-6: Trigger Ansible Playbook') {
+        stage('Deploy using Ansible') {
             steps {
                 sh "ansible-playbook deploy.yml --extra-vars \"container_name=${params.CONTAINER_NAME}\""
             }
@@ -65,13 +64,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully 🎉"
+            echo "Pipeline completed successfully"
         }
         failure {
-            echo "Pipeline failed ❌"
-        }
-        always {
-            echo "Pipeline execution finished"
+            echo "Pipeline failed"
         }
     }
 }
