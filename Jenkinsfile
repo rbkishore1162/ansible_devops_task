@@ -10,7 +10,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "venkateshjaggaraju/static-webapp"
+        IMAGE_NAME = "kishore1145/static-webapp"
         IMAGE_TAG = "v1"
         DOCKERHUB_CREDENTIALS = "dockerhub-creds"
     }
