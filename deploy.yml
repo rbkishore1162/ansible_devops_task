@@ -4,8 +4,7 @@
   become: yes
 
   vars:
-    container_name: static-webapp
-    image_name: yourdockerhubusername/static-webapp:v1
+    image_name: kishore1145/static-webapp:v1
 
   tasks:
 
