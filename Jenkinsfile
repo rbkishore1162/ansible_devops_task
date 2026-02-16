@@ -1,5 +1,12 @@
 pipeline {
     agent any
+    
+    stage('Build Maven Project') {
+    steps {
+        sh 'mvn clean package -DskipTests'
+    }
+}
+
 
     parameters {
         choice(
